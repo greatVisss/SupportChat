@@ -1,6 +1,5 @@
 package com.example.supportchat
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,15 +30,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.supportchat.ui.theme.ColorModelMessage
 import com.example.supportchat.ui.theme.ColorUserMessage
+import org.intellij.lang.annotations.JdkConstants
 
 @Composable
 fun ChatPage(modifier: Modifier = Modifier, viewModel: ChatViewModel){
     Column(modifier = modifier) {
+        MenuRow()
         MessageList(messageList = viewModel.messageList, modifier = Modifier.weight(1f))
         messageInput(onMessageSend = {
             viewModel.sendMessage(it)
@@ -53,11 +56,15 @@ fun MessageList(modifier: Modifier = Modifier, messageList: List<MessageModel>){
         Column(modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
-            Image(modifier = Modifier.size(90.dp),
+            Image(modifier = Modifier.size(110.dp),
                 painter = painterResource(id = R.drawable.chatbot_icon),
                 contentDescription = "Icon"
             )
-            Text(text = "¿Como te sientes hoy?", fontSize = 25.sp)
+            Text(text = "¿Como te sientes hoy?",
+                fontSize = 25.sp,
+                fontStyle = FontStyle.Italic,
+                fontWeight = FontWeight.Bold,
+                color = Color.Gray)
         }
     }else {
         LazyColumn(modifier = modifier, reverseLayout = true) {
@@ -74,12 +81,16 @@ fun MessageRow(messageModel: MessageModel){
     
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier.fillMaxWidth()){
-            Box(modifier = Modifier.align(if(isModel) Alignment.BottomStart else Alignment.BottomEnd)
-                .padding(start = if(isModel) 10.dp else 65.dp,
-                        end = if(isModel) 65.dp else 10.dp,
-                        top = 5.dp, bottom = 5.dp)
+            Box(modifier = Modifier
+                .align(if (isModel) Alignment.BottomStart else Alignment.BottomEnd)
+                .padding(
+                    start = if (isModel) 10.dp else 65.dp,
+                    end = if (isModel) 65.dp else 10.dp,
+                    top = 5.dp, bottom = 5.dp
+                )
                 .clip(RoundedCornerShape(30.dp))
-                .background(if(isModel) ColorModelMessage else ColorUserMessage).padding(18.dp)) {
+                .background(if (isModel) ColorModelMessage else ColorUserMessage)
+                .padding(18.dp)) {
                     Text(text = messageModel.message, fontWeight = FontWeight.W400,
                         color = if(isModel) Color.White else Color.Black)
             }
@@ -99,6 +110,18 @@ fun messageInput(onMessageSend : (String) -> Unit){
                 onMessageSend(message)
                 message = ""
             }
-        }) { Icon(imageVector = Icons.Default.Send, contentDescription = "Send") }
+        }) { Icon(imageVector = Icons.Default.Send,
+            contentDescription = "Send",
+            tint = Color.Blue,
+            modifier = Modifier.size(50.dp)) }
+    }
+}
+
+@Composable
+fun MenuRow(){
+    Row(modifier = Modifier.fillMaxWidth().background(color = Color.Blue),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically){
+        Text(text = "NombreUsuario", modifier = Modifier.padding(10.dp))
     }
 }
