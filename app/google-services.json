@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1020368162316",
+    "project_id": "supportchat-a4e17",
+    "storage_bucket": "supportchat-a4e17.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1020368162316:android:75b76a8a577b1bc2862829",
+        "android_client_info": {
+          "package_name": "com.example.supportchat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQeTRCw0Y5yKbcQlcodYqRVu3EQM7tggw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
