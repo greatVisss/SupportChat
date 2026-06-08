@@ -18,6 +18,8 @@ class ChatViewModel: ViewModel() {
     private var initialized = false
     var currentUser=""
     var currentChatId=""
+
+    var waitingResponse = mutableStateOf(false)
     val chatList by lazy { mutableStateListOf<ChatModel>() }
 
     val messageList by lazy { mutableStateListOf<MessageModel>() }
@@ -48,6 +50,11 @@ class ChatViewModel: ViewModel() {
                      """
 
     fun sendMessage(question:String){
+
+        if(waitingResponse.value)
+            return
+
+        waitingResponse.value = true
 
         viewModelScope.launch {
 
@@ -221,9 +228,13 @@ class ChatViewModel: ViewModel() {
 
                 )
 
+                waitingResponse.value = false
+
             }
 
             catch(e:Exception){
+
+                waitingResponse.value = false
 
                 if(
 

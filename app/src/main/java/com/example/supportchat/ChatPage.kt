@@ -83,7 +83,8 @@ fun ChatPage(
                 modifier = Modifier.weight(1f)
             )
 
-            messageInput{ viewModel.sendMessage(it) }
+            messageInput(enabled = !viewModel.waitingResponse.value)
+            { viewModel.sendMessage(it) }
         }
 
         if(sidebarOpen){
@@ -188,28 +189,95 @@ fun MessageRow(messageModel: MessageModel){
 }
 
 @Composable
-fun messageInput(onMessageSend : (String) -> Unit){
-    var message by remember { mutableStateOf("") }
-    Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp).background(color = Color.Transparent), verticalAlignment = Alignment.CenterVertically) {
+fun messageInput(
+    enabled:Boolean,
+    onMessageSend:(String)->Unit
+){
+    var message by remember {
+        mutableStateOf("")
+    }
+
+    Row(
+        modifier =
+            Modifier
+                .padding(
+                    horizontal = 10.dp,
+                    vertical = 4.dp
+                ),
+        verticalAlignment =
+            Alignment.CenterVertically
+    ){
+
         OutlinedTextField(
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF3eaaae),
-                cursorColor = Color(0xFF3eaaae),
-                focusedTextColor = Color(0xFF446176),
-                unfocusedTextColor = Color(0xFF446176)
-            ),
-            value = message, onValueChange = { message = it},
-            shape = RoundedCornerShape(15.dp),
-            modifier = Modifier.weight(1f))
-        IconButton(onClick = {
-            if(message.isNotEmpty()) {
-                onMessageSend(message)
-                message = ""
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor =
+                        Color(0xFF3eaaae),
+                    cursorColor =
+                        Color(0xFF3eaaae),
+                    focusedTextColor =
+                        Color(0xFF446176),
+                    unfocusedTextColor =
+                        Color(0xFF446176)
+                ),
+
+            value = message,
+
+            onValueChange = {
+                message = it
+            },
+
+            enabled = enabled,
+
+            shape =
+                RoundedCornerShape(
+                    15.dp
+                ),
+
+            modifier =
+                Modifier.weight(1f)
+        )
+
+        IconButton(
+
+            enabled = enabled,
+
+            onClick = {
+
+                if(
+                    message.isNotBlank()
+                ){
+
+                    onMessageSend(
+                        message
+                    )
+
+                    message=""
+                }
             }
-        }) { Icon(imageVector = Icons.Default.Send,
-            contentDescription = "Send",
-            tint = Color(0xff446176),
-            modifier = Modifier.size(40.dp)) }
+
+        ){
+
+            Icon(
+
+                imageVector =
+                    Icons.Default.Send,
+
+                contentDescription =
+                    "Send",
+
+                tint =
+                    if(enabled)
+                        Color(0xff446176)
+                    else
+                        Color.Gray,
+
+                modifier =
+                    Modifier.size(
+                        40.dp
+                    )
+            )
+        }
     }
 }
 
