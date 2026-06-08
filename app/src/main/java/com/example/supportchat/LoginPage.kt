@@ -173,7 +173,7 @@ fun LoginPage(
                         if(loading)
                             "..."
                         else
-                            "Entrar"
+                            "Entrar", color = Color(0xfffffee4)
                     )
                 }
 

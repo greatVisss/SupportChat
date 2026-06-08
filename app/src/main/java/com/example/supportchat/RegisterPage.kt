@@ -204,7 +204,7 @@ fun RegisterPage(
                         if(loading)
                             "..."
                         else
-                            "Crear"
+                            "Crear", color = Color(0xfffffee4)
                     )
                 }
 

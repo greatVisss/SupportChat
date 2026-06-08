@@ -99,7 +99,7 @@ fun ChatPage(
                     }
             ){
                 Column(modifier = Modifier.fillMaxHeight()
-                    .size(width = 190.dp, height = 0.dp)
+                    .size(width = 240.dp, height = 0.dp)
                     .background(Color(0Xff446176)).align(Alignment.CenterStart)
                     .clickable(indication = null,
                         interactionSource = remember { MutableInteractionSource() }){ /* consume click */}
@@ -179,7 +179,9 @@ fun MessageRow(messageModel: MessageModel){
                 .background(if (isModel) ColorModelMessage else ColorUserMessage)
                 .padding(18.dp)) {
                     Text(text = messageModel.message, fontWeight = FontWeight.W400,
-                        color = if(isModel) Color.White else Color.White)
+                        color = if(isModel) Color.White else Color.White,
+                        style = TextStyle(fontSize = 13.sp)
+                    )
             }
         }
     }
@@ -218,14 +220,12 @@ fun MenuRow(
     onLogout:()->Unit
 ){
     Row(
-        modifier=
-            Modifier
+        modifier = Modifier
                 .fillMaxWidth()
                 .background(
                     Color(0xff446176)
                 ),
-        verticalAlignment=
-            Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ){
         TextButton(onClick= onOpenMenu
         ){
@@ -233,7 +233,7 @@ fun MenuRow(
                 style = TextStyle(fontSize = 25.sp))
         }
         Text(username,
-            modifier= Modifier.weight(1f),
+            modifier= Modifier.weight(1f).padding(vertical = 17.dp),
             color = Color(0xFFc4f0c2),
             style = TextStyle(fontSize = 22.sp,
                 textAlign = TextAlign.Center)
