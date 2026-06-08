@@ -18,13 +18,10 @@ class ChatViewModel: ViewModel() {
     private var initialized = false
     var currentUser=""
     var currentChatId=""
-    val chatList by lazy {
-        mutableStateListOf<ChatModel>()
-    }
+    val chatList by lazy { mutableStateListOf<ChatModel>() }
 
-    val messageList by lazy {
-        mutableStateListOf<MessageModel>()
-    }
+    val messageList by lazy { mutableStateListOf<MessageModel>() }
+
     val generativeModel: GenerativeModel = GenerativeModel(
         modelName = "gemini-3.5-flash",
         apiKey = Constants.apiKey
@@ -50,87 +47,218 @@ class ChatViewModel: ViewModel() {
                     - Refuerza la idea de que la persona no está sola y puede buscar ayuda externa. 
                      """
 
-    fun sendMessage(question : String){
+    fun sendMessage(question:String){
+
         viewModelScope.launch {
-            try {
-                if(!chatCreated){
-                    chatCreated = true
-                    val generatedTitle = generateChatTitle(question)
-                    ChatManager.createChat(
-                        currentUser,
-                        currentChatId,
-                        generatedTitle
+
+            try{
+
+                val userMsg = MessageModel(
+
+                    question,
+
+                    "user"
+
+                )
+
+                // Mostrar inmediatamente
+
+                messageList.add(
+                    userMsg
+                )
+
+                ChatManager.saveMessage(
+
+                    currentUser,
+
+                    currentChatId,
+
+                    userMsg
+
+                )
+
+                // Mostrar escribiendo
+
+                messageList.add(
+
+                    MessageModel(
+
+                        "...",
+
+                        "model"
+
                     )
+
+                )
+
+                if(!chatCreated){
+
+                    chatCreated=true
+
+                    val generatedTitle=
+
+                        generateChatTitle(
+                            question
+                        )
+
+                    ChatManager.createChat(
+
+                        currentUser,
+
+                        currentChatId,
+
+                        generatedTitle
+
+                    )
+
                     loadChats()
+
                 }
 
                 val historyContent = mutableListOf(
+
                     content(
-                        role = "user"
+
+                        role="user"
+
                     ){
+
                         text(
                             emotionalPrompt
                         )
+
                     }
+
                 )
 
                 historyContent.addAll(
-                    messageList.map {
-                        content(
-                            it.role
-                        ){
-                            text(
-                                it.message
-                            )
+
+                    messageList
+
+                        .filter {
+
+                            it.message!="..."
+
                         }
-                    }
+
+                        .map {
+
+                            content(
+
+                                it.role
+
+                            ){
+
+                                text(
+                                    it.message
+                                )
+
+                            }
+
+                        }
+
                 )
 
-                val chat = generativeModel.startChat(
-                    history = historyContent
-                )
+                val chat=
 
-                //Crea mensaje saveable
-                val userMsg= MessageModel(
-                        question,
-                        "user"
+                    generativeModel.startChat(
+
+                        history=
+                            historyContent
+
                     )
 
-                messageList.add(userMsg)
+                val response=
 
-                ChatManager.saveMessage(
-                    currentUser,
-                    currentChatId,
-                    userMsg
-                )
-                //////
+                    chat.sendMessage(
 
-                messageList.add(MessageModel("...", role = "model"))
+                        question
 
-                val response = chat.sendMessage(question)
+                    )
 
-                messageList.removeAt(messageList.lastIndex)
+                // quitar ...
 
-                //Crea respuesta saveable
-                val modelMsg= MessageModel(
-                        response.text.toString(),
+                if(
+
+                    messageList.isNotEmpty()
+
+                    &&
+
+                    messageList.last().message=="..."
+
+                ){
+
+                    messageList.removeAt(
+
+                        messageList.lastIndex
+
+                    )
+
+                }
+
+                val modelMsg=
+
+                    MessageModel(
+
+                        response.text
+                            ?: "",
+
                         "model"
+
                     )
 
-                messageList.add(modelMsg)
-
-                ChatManager.saveMessage(
-                    currentUser,
-                    currentChatId,
+                messageList.add(
                     modelMsg
                 )
-                /////////
 
-            }catch (e: Exception){
-                messageList.removeAt(messageList.lastIndex)
-                messageList.add(MessageModel("Error: " + e.message.toString(), "model"))
+                ChatManager.saveMessage(
+
+                    currentUser,
+
+                    currentChatId,
+
+                    modelMsg
+
+                )
+
             }
+
+            catch(e:Exception){
+
+                if(
+
+                    messageList.isNotEmpty()
+
+                    &&
+
+                    messageList.last().message=="..."
+
+                ){
+
+                    messageList.removeAt(
+
+                        messageList.lastIndex
+
+                    )
+
+                }
+
+                messageList.add(
+
+                    MessageModel(
+
+                        "Error: ${e.message}",
+
+                        "model"
+
+                    )
+
+                )
+
+            }
+
         }
+
     }
 
     fun initializeUser(username:String){

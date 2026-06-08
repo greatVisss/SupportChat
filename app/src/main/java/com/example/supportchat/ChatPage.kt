@@ -18,12 +18,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -40,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.supportchat.ui.theme.ColorModelMessage
@@ -54,15 +57,24 @@ fun ChatPage(
     val context = LocalContext.current
     var sidebarOpen by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier.fillMaxSize()
+    Box(modifier = modifier.fillMaxSize().background(color = Color(0xfffffee4))
     ){
         Column{
             MenuRow(
                 username = viewModel.currentUser,
                 onOpenMenu = { sidebarOpen = !sidebarOpen },
-                onLogout = { SessionManager.logout(context)
+                onLogout={
+                    SessionManager.logout(context)
                     viewModel.messageList.clear()
-                    (context as MainActivity).recreate()
+                    viewModel.chatList.clear()
+                    viewModel.currentUser=""
+                    viewModel.currentChatId=""
+                    (context as MainActivity)
+                        .finish()
+
+                    context.startActivity(
+                        context.intent
+                    )
                 }
             )
 
@@ -88,7 +100,7 @@ fun ChatPage(
             ){
                 Column(modifier = Modifier.fillMaxHeight()
                     .size(width = 190.dp, height = 0.dp)
-                    .background(Color.DarkGray).align(Alignment.CenterStart)
+                    .background(Color(0Xff446176)).align(Alignment.CenterStart)
                     .clickable(indication = null,
                         interactionSource = remember { MutableInteractionSource() }){ /* consume click */}
                 ){
@@ -97,17 +109,25 @@ fun ChatPage(
                             viewModel.createNewChat()
                         }
                     ){
-                        Text("+ Nuevo Chat")
+                        Text("+ Nuevo Chat", modifier = Modifier.fillMaxWidth(),
+                            color = Color(0xFFbec0c0),
+                            style = TextStyle(fontStyle = FontStyle.Italic,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold))
                     }
                     LazyColumn{
-                        items(viewModel.chatList){
+                        items(viewModel.chatList.sortedByDescending { it.timestamp })
+                        {
                             TextButton(
                                 onClick = {
                                     sidebarOpen = false
                                     viewModel.loadChat(it.id)
                                 }
                             ){
-                                Text(it.title)
+                                Text(it.title, modifier = Modifier.fillMaxWidth(),
+                                    color = Color(0xFFbec0c0),
+                                    style = TextStyle(fontStyle = FontStyle.Italic,
+                                        fontSize = 16.sp))
                             }
                         }
                     }
@@ -124,14 +144,14 @@ fun MessageList(modifier: Modifier = Modifier, messageList: List<MessageModel>){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
             Image(modifier = Modifier.size(110.dp),
-                painter = painterResource(id = R.drawable.chatbot_icon),
+                painter = painterResource(id = R.drawable.suppchat_icon2),
                 contentDescription = "Icon"
             )
             Text(text = "¿Como te sientes hoy?",
                 fontSize = 25.sp,
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
-                color = Color.Gray)
+                color = Color(0xffbec0c0))
         }
     }else {
         LazyColumn(modifier = modifier, reverseLayout = true) {
@@ -159,7 +179,7 @@ fun MessageRow(messageModel: MessageModel){
                 .background(if (isModel) ColorModelMessage else ColorUserMessage)
                 .padding(18.dp)) {
                     Text(text = messageModel.message, fontWeight = FontWeight.W400,
-                        color = if(isModel) Color.White else Color.Black)
+                        color = if(isModel) Color.White else Color.White)
             }
         }
     }
@@ -168,9 +188,16 @@ fun MessageRow(messageModel: MessageModel){
 @Composable
 fun messageInput(onMessageSend : (String) -> Unit){
     var message by remember { mutableStateOf("") }
-    Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp).background(color = Color.Transparent), verticalAlignment = Alignment.CenterVertically) {
         OutlinedTextField(
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF3eaaae),
+                cursorColor = Color(0xFF3eaaae),
+                focusedTextColor = Color(0xFF446176),
+                unfocusedTextColor = Color(0xFF446176)
+            ),
             value = message, onValueChange = { message = it},
+            shape = RoundedCornerShape(15.dp),
             modifier = Modifier.weight(1f))
         IconButton(onClick = {
             if(message.isNotEmpty()) {
@@ -179,8 +206,8 @@ fun messageInput(onMessageSend : (String) -> Unit){
             }
         }) { Icon(imageVector = Icons.Default.Send,
             contentDescription = "Send",
-            tint = Color.Blue,
-            modifier = Modifier.size(50.dp)) }
+            tint = Color(0xff446176),
+            modifier = Modifier.size(40.dp)) }
     }
 }
 
@@ -195,23 +222,31 @@ fun MenuRow(
             Modifier
                 .fillMaxWidth()
                 .background(
-                    Color.Blue
+                    Color(0xff446176)
                 ),
         verticalAlignment=
             Alignment.CenterVertically
     ){
         TextButton(onClick= onOpenMenu
         ){
-            Text("☰")
+            Text("☰",color = Color(0xFFc4f0c2),
+                style = TextStyle(fontSize = 25.sp))
         }
         Text(username,
-            modifier= Modifier.weight(1f)
+            modifier= Modifier.weight(1f),
+            color = Color(0xFFc4f0c2),
+            style = TextStyle(fontSize = 22.sp,
+                textAlign = TextAlign.Center)
         )
         TextButton(
             onClick=
                 onLogout
         ){
-            Text("Salir")
+            //Text("Salir")
+            Icon(imageVector = Icons.Default.Home,
+                contentDescription = "Send",
+                tint = Color(0xffc4f0c2),
+                modifier = Modifier.size(30.dp))
         }
     }
 }

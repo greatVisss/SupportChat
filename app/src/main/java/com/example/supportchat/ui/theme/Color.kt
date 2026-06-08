@@ -11,5 +11,5 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 
-val ColorUserMessage = Color(0xFF95D7BD)
-val ColorModelMessage = Color(0xFF005B52)
+val ColorUserMessage = Color(0xFF3eaaae)
+val ColorModelMessage = Color(0xFFff7a8f)
